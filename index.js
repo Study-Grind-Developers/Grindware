@@ -14,7 +14,7 @@ app.use(bodyParser.json());
 mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
   .then(client => {
     console.log('Connected to MongoDB');
-    const db = client.db('your_database_name'); // Replace with your database name
+    const db = client.db('tutoring'); // Use the correct database name
     const usersCollection = db.collection('users'); // Collection for users
 
     // Middleware to verify JWT token
@@ -29,15 +29,17 @@ mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopolog
       }
     }
 
-    // Routes for authentication
+    // User Registration Route
     app.post('/api/register', async (req, res) => {
-      const { username, password, email } = req.body;
+      const { username, password, email, role } = req.body;
       const hashedPassword = await bcrypt.hash(password, 10);
 
       const newUser = {
         username: username,
         password: hashedPassword,
-        email: email
+        email: email,
+        role: role || 'user', // Default to 'user' if not provided
+        tutoringCredentials: {} // Initialize as an empty object or provide default values
       };
 
       try {
@@ -49,6 +51,7 @@ mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopolog
       }
     });
 
+    // User Login Route
     app.post('/api/login', async (req, res) => {
       const { username, password } = req.body;
 
@@ -59,8 +62,8 @@ mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopolog
         } else {
           const passwordMatch = await bcrypt.compare(password, user.password);
           if (passwordMatch) {
-            const token = jwt.sign({ username: user.username }, secretKey);
-            res.json({ token });
+            const token = jwt.sign({ username: user.username, role: user.role }, secretKey);
+            res.json({ token, role: user.role }); // Send role back to client
           } else {
             res.status(401).json({ message: 'Incorrect password' });
           }
@@ -71,6 +74,7 @@ mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopolog
       }
     });
 
+    // Protected Route for User Profile
     app.get('/api/profile', verifyToken, (req, res) => {
       jwt.verify(req.token, secretKey, (err, authData) => {
         if (err) {
@@ -80,6 +84,25 @@ mongodb.MongoClient.connect(mongoURI, { useNewUrlParser: true, useUnifiedTopolog
         }
       });
     });
+
+    // Redirect Route Based on User Role
+    app.get('/api/redirect', verifyToken, async (req, res) => {
+      jwt.verify(req.token, secretKey, async (err, authData) => {
+        if (err) {
+          res.sendStatus(403);
+        } else {
+          const user = await usersCollection.findOne({ username: authData.username });
+          if (user && user.role === 'tutor') {
+            res.redirect('/tutor/home'); // Redirect to tutor home page
+          } else {
+            res.redirect('/user/home'); // Redirect to user home page
+          }
+        }
+      });
+    });
+
+    // Serve Static Files
+    app.use(express.static('public'));
 
     app.listen(port, () => {
       console.log(`Server is running on http://localhost:${port}`);
