@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Profile Settings - Tutoring Website</title>
+  <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+    <a class="navbar-brand" href="index.html">Tutoring</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNav">
+      <ul class="navbar-nav ml-auto">
+        <li class="nav-item">
+          <a class="nav-link" href="index.html">Home</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="about.html">About</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="contact.html">Contact</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="lessons.html">Lessons/Booking</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="login.html">Sign Up / Log In</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="/pages/profile_settings">Profile</a>
+        </li>
+      </ul>
+    </div>
+  </nav>
+
+  <div class="container">
+    <h1>Profile Settings</h1>
+    <form id="profileForm">
+      <div class="form-group">
+        <label for="profileUsername">Username</label>
+        <input type="text" class="form-control" id="profileUsername">
+      </div>
+      <div class="form-group">
+        <label for="profileEmail">Email address</label>
+        <input type="email" class="form-control" id="profileEmail">
+      </div>
+      <div class="form-group">
+        <label for="profilePassword">Password</label>
+        <input type="password" class="form-control" id="profilePassword">
+      </div>
+      <button type="submit" class="btn btn-primary">Update Profile</button>
+    </form>
+  </div>
+
+  <script>
+    async function fetchProfile() {
+      const response = await fetch('/auth/profile');
+      const result = await response.json();
+      if (response.ok) {
+        document.getElementById('profileUsername').value = result.user.username;
+        document.getElementById('profileEmail').value = result.user.email;
+      } else {
+        alert(result.message);
+      }
+    }
+
+    document.getElementById('profileForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const username = document.getElementById('profileUsername').value;
+      const email = document.getElementById('profileEmail').value;
+      const password = document.getElementById('profilePassword').value;
+      const response = await fetch('/auth/profile', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, email, password })
+      });
+      const result = await response.json();
+      alert(result.message);
+    });
+
+    fetchProfile();
+  </script>
+</body>
+</html>
