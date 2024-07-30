@@ -34,8 +34,54 @@
       min-height: 40px;
     }
     .mathquill-container {
-      margin-top: 20px; /* Adjust this value to move the MathQuill field down */
+      margin-top: 15px; /* Adjust this value to move the MathQuill field down */
+      margin-bottom: 0px; /* Adjust this value to move the MathQuill field down */
     }
+    /* Hide the default radio button */
+  input[type="radio"] {
+    display: none;
+  }
+
+  /* Style the custom radio button */
+  input[type="radio"] + label {
+    position: relative;
+    padding-left: 35px;
+    cursor: pointer;
+    display: inline-block;
+    line-height: 20px;
+    font-size: 18px;
+    user-select: none;
+  }
+
+  input[type="radio"] + label:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    border: 2px solid #ccc;
+    border-radius: 50%;
+    background-color: #fff;
+  }
+
+  input[type="radio"]:checked + label:before {
+    border-color: #3ea2ff;
+    background-color: #3ea2ff;
+  }
+
+  input[type="radio"]:checked + label:after {
+    content: '';
+    position: absolute;
+    left: 6px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background-color: #fff;
+  }
   </style>
   <!-- MathQuill CSS -->
   <link rel="stylesheet" href="./mathquill.css"/> <!-- Relative path for MathQuill CSS -->
@@ -258,22 +304,25 @@ function replaceVariables(text, variables) {
     }
 
     var choicesHTML = options.map(option => {
-      // Ensure option is a string before splitting
-      if (typeof option === 'string') {
-        var parts = option.split('$');
-        var renderedOption = parts.map((part, index) => {
-          if (index % 2 === 1) {
-            return '<span class="mathquill-noneditable">' + part + '</span>';
-          } else {
-            return part;
-          }
-        }).join('');
-        return '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + renderedOption + '</label>';
+  // Ensure option is a string before splitting
+  if (typeof option === 'string') {
+    var parts = option.split('$');
+    var renderedOption = parts.map((part, index) => {
+      if (index % 2 === 1) {
+        return '<span class="mathquill-noneditable">' + part + '</span>';
       } else {
-        // Handle non-string options gracefully
-        return '<label><input type="radio" name="multiple-choice-' + uniqueQuestionId + '"> ' + option + '</label>';
+        return part;
       }
-    }).join('<br>');
+    }).join('');
+    return '<input type="radio" name="multiple-choice-' + uniqueQuestionId + '" id="option-' + uniqueQuestionId + '-' + option + '">' + 
+           '<label for="option-' + uniqueQuestionId + '-' + option + '">' + renderedOption + '</label>';
+  } else {
+    // Handle non-string options gracefully
+    return '<input type="radio" name="multiple-choice-' + uniqueQuestionId + '" id="option-' + uniqueQuestionId + '-' + option + '">' + 
+           '<label for="option-' + uniqueQuestionId + '-' + option + '">' + option + '</label>';
+  }
+}).join('<br>');
+
 
     return '<div>' + choicesHTML + '</div>';
   }
