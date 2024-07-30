@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tutor Dashboard</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .navbar {
+            background-color: #333;
+        }
+        .navbar-brand, .nav-link {
+            color: #fff !important;
+        }
+        .dashboard {
+            padding: 20px;
+        }
+        .greeting {
+            font-size: 1.5em;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg">
+        <a class="navbar-brand" href="#">Tutor Dashboard</a>
+        <div class="collapse navbar-collapse">
+            <ul class="navbar-nav ml-auto">
+                <li class="nav-item"><a class="nav-link" href="#">Home</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Lessons</a></li>
+                <li class="nav-item"><a class="nav-link" href="#">Resources</a></li>
+                <li class="nav-item"><a class="nav-link" href="/auth/logout">Logout</a></li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container dashboard">
+        <div class="greeting" id="greeting"></div>
+        <div class="row">
+            <div class="col-md-8">
+                <h3>Upcoming Lessons</h3>
+                <div id="lessons"></div>
+            </div>
+            <div class="col-md-4">
+                <h3>Resources</h3>
+                <ul>
+                    <li><a href="#">Lesson Plans</a></li>
+                    <li><a href="#">Student Notes</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Fetch tutor's data and scheduled lessons
+            fetch('/api/tutor/dashboard')
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('greeting').textContent = `Hey ${data.username}, these are your upcoming lessons`;
+                    // Populate lessons and other data
+                })
+                .catch(error => console.error('Error fetching data:', error));
+        });
+    </script>
+</body>
+</html>

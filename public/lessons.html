@@ -72,9 +72,14 @@
 
   <!-- JavaScript for redirection -->
   <script>
+    const isAuth = false;
     function redirectToLogin() {
-      // Redirect to the login page
-      window.location.href = "login.html";
+      if (isAuth == true) {
+        window.location.href = "index.html";
+      }
+      else{
+        window.location.href = "login.html";
+      }
     }
   </script>
 

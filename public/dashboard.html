@@ -69,11 +69,11 @@
           credentials: 'include'  // Send cookies along with the request
         });
         if (response.status === 401) {  // Unauthorized
-          window.location.href = '/login.html';  // Redirect to login page
+          window.location.href = '../public/logIn.html';  // Redirect to login page
         }
       } catch (error) {
         console.error('Error checking authentication status:', error);
-        window.location.href = '/login.html';  // Redirect in case of error
+        window.location.href = '../public/logIn.html';  // Redirect in case of error
       }
     }
   

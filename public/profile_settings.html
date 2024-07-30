@@ -56,32 +56,43 @@
   </div>
 
   <script>
-    async function fetchProfile() {
-      const response = await fetch('/auth/profile');
-      const result = await response.json();
-      if (response.ok) {
-        document.getElementById('profileUsername').value = result.user.username;
-        document.getElementById('profileEmail').value = result.user.email;
-      } else {
-        alert(result.message);
-      }
+
+    // Get profile data
+router.get('/profile', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  try {
+    const user = await User.findById(req.session.userId).select('-password');
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    res.status(200).json({ user });
+  } catch (err) {
+    res.status(500).json({ message: 'Error fetching profile', error: err });
+  }
+});
 
-    document.getElementById('profileForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const username = document.getElementById('profileUsername').value;
-      const email = document.getElementById('profileEmail').value;
-      const password = document.getElementById('profilePassword').value;
-      const response = await fetch('/auth/profile', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, email, password })
-      });
-      const result = await response.json();
-      alert(result.message);
-    });
-
-    fetchProfile();
+// Update profile data
+router.put('/profile', async (req, res) => {
+  if (!req.session.userId) {
+    return res.status(401).json({ message: 'Unauthorized' });
+  }
+  const { username, email, password } = req.body;
+  try {
+    const user = await User.findById(req.session.userId);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+    if (username) user.username = username;
+    if (email) user.email = email;
+    if (password) user.password = await bcrypt.hash(password, 12);
+    await user.save();
+    res.status(200).json({ message: 'Profile updated successfully' });
+  } catch (err) {
+    res.status(500).json({ message: 'Error updating profile', error: err });
+  }
+});
   </script>
 </body>
 </html>
