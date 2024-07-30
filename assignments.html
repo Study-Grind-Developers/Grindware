@@ -260,7 +260,6 @@ function replaceVariables(text, variables) {
     var choicesHTML = options.map(option => {
       // Ensure option is a string before splitting
       if (typeof option === 'string') {
-        var rawAnswer = option;
         var parts = option.split('$');
         var renderedOption = parts.map((part, index) => {
           if (index % 2 === 1) {
@@ -339,7 +338,7 @@ function replaceVariables(text, variables) {
           var selectedAnswerValue = selectedAnswer.nextSibling.textContent.trim();
 
           console.log(selectedAnswerValue)
-          console.log(correctAnswer)
+          console.log(correctAnswer.toString())
 
           if (selectedAnswerValue === correctAnswer.toString()) {
             alert('Correct!');
