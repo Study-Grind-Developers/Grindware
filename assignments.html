@@ -41,6 +41,7 @@
   input[type="radio"] {
     display: none;
   }
+
   /* Style the custom radio button */
   input[type="radio"] + label {
     position: relative;
@@ -376,53 +377,52 @@ function replaceVariables(text, variables) {
     }
 
     function checkAnswer(uniqueQuestionId) {
-      var answerType = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]') ? 'multiple-choice' : 'short-answer';
+  var answerType = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]') ? 'multiple-choice' : 'short-answer';
 
-      if (answerType === 'multiple-choice') {
-        var correctAnswer = correctAnswers[uniqueQuestionId];
-        var selectedAnswer = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]:checked');
+  if (answerType === 'multiple-choice') {
+    var correctAnswer = correctAnswers[uniqueQuestionId];
+    var selectedAnswer = document.querySelector('input[name="multiple-choice-' + uniqueQuestionId + '"]:checked');
 
-        if (selectedAnswer) {
-          var selectedAnswerValue = selectedAnswer.nextSibling.textContent.trim();
+    if (selectedAnswer) {
+      var selectedAnswerValue = selectedAnswer.id.replace(/^option-\d+-\d+-/, '');
 
-          console.log(selectedAnswerValue)
-          console.log(correctAnswer.toString())
+      console.log(selectedAnswer)
+      console.log(selectedAnswer.id)
+      console.log(selectedAnswerValue);
+      console.log(correctAnswer.toString());
 
-          if (selectedAnswerValue === correctAnswer.toString()) {
-            alert('Correct!');
-          } else {
-            alert('Incorrect. Please select the correct answer.');
-          }
-        } else {
-          alert('Please select an answer.');
-        }
-      } else if (answerType === 'short-answer') {
-        var correctAnswer = correctAnswers[uniqueQuestionId];
-        var mathField = mathFieldMap.get('answer-' + uniqueQuestionId); // Retrieve MathQuill instance from Map
-
-        if (mathField) {
-          console.log('mathField:', mathField); // Debugging line
-          console.log('typeof mathField:', typeof mathField); // Debugging line
-
-          var enteredAnswer;
-          try {
-            enteredAnswer = mathField.latex();
-          } catch (error) {
-            console.error('Error accessing latex method:', error);
-            alert('Error accessing the answer field.');
-            return;
-          }
-
-          if (enteredAnswer === correctAnswer.toString()) {
-            alert('Correct!');
-          } else {
-            alert('Incorrect. Please enter the correct answer.');
-          }
-        } else {
-          alert('MathQuill field not found.');
-        }
+      if (selectedAnswerValue === correctAnswer.toString()) {
+        alert('Correct!');
+      } else {
+        alert('Incorrect. Please select the correct answer.');
       }
+    } else {
+      alert('Please select an answer.');
     }
+  } else if (answerType === 'short-answer') {
+    var correctAnswer = correctAnswers[uniqueQuestionId];
+    var mathField = mathFieldMap.get('answer-' + uniqueQuestionId); // Retrieve MathQuill instance from Map
+
+    if (mathField) {
+      var enteredAnswer;
+      try {
+        enteredAnswer = mathField.latex();
+      } catch (error) {
+        console.error('Error accessing latex method:', error);
+        alert('Error accessing the answer field.');
+        return;
+      }
+
+      if (enteredAnswer === correctAnswer.toString()) {
+        alert('Correct!');
+      } else {
+        alert('Incorrect. Please enter the correct answer.');
+      }
+    } else {
+      alert('MathQuill field not found.');
+    }
+  }
+}
   </script>
 </body>
 </html>
